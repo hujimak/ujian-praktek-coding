@@ -1,16 +1,109 @@
-# React + Vite
+# 👥 Minstagram - Social Media Sederhana
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Website sosial media sederhana menggunakan React JS yang menampilkan data user dari API JSONPlaceholder.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## 🌐 Fetch API
 
-## React Compiler
+Data user diambil dari `https://jsonplaceholder.typicode.com/users` menggunakan `fetch()` di dalam `useEffect`.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+```jsx
+useEffect(() => {
+  fetch("https://jsonplaceholder.typicode.com/users")
+    .then((res) => res.json())
+    .then((data) => {
+      setUsers(data);
+      setLoading(false);
+    })
+    .catch((err) => {
+      setError("Gagal mengambil data. Coba refresh halaman.");
+      setLoading(false);
+    });
+}, []);
+```
 
-## Expanding the ESLint configuration
+`fetch()` → mengambil data dari URL API
+`.then((res) => res.json())` → mengubah response ke format JSON
+`.then((data) => setUsers(data))` → menyimpan data ke state
+`.catch()` → menangkap error jika fetch gagal
+`[]` → useEffect hanya berjalan sekali saat halaman pertama dibuka
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+---
+
+## 🧩 Penjelasan Component
+
+| Component | Fungsi |
+`App.jsx` = Komponen utama, berisi logika fetch API dan filter search |
+`Navbar.jsx` = Menampilkan logo dan search bar untuk mencari user |
+`UserCard.jsx` | Menampilkan informasi user beserta tombol Like dan Follow |
+`Footer.jsx` = Menampilkan informasi di bagian bawah halaman |
+`AppContext.jsx` = Menyimpan state likes dan follows secara global |
+
+---
+
+## ⚓ Implementasi React Hook
+
+### useState
+Menyimpan data yang bisa berubah seperti daftar user, kata pencarian, status loading, dan data likes/follows.
+
+```jsx
+// App.jsx
+const [users, setUsers] = useState([]);
+const [searchQuery, setSearchQuery] = useState("");
+const [loading, setLoading] = useState(true);
+const [error, setError] = useState(null);
+
+// AppContext.jsx
+const [likedUsers, setLikedUsers] = useState([]);
+const [followedUsers, setFollowedUsers] = useState([]);
+```
+
+### useEffect
+Menjalankan fetch API otomatis saat halaman pertama kali dibuka.
+
+```jsx
+// App.jsx
+useEffect(() => {
+  fetch("https://jsonplaceholder.typicode.com/users")
+    .then((res) => res.json())
+    .then((data) => setUsers(data));
+}, []);
+```
+
+### useContext
+Berbagi state likes dan follows ke semua komponen tanpa kirim props satu per satu.
+
+```jsx
+// AppContext.jsx - membuat context
+const AppContext = createContext();
+
+export const AppProvider = ({ children }) => {
+  const [likedUsers, setLikedUsers] = useState([]);
+  const [followedUsers, setFollowedUsers] = useState([]);
+
+  return (
+    <AppContext.Provider value={{ likedUsers, followedUsers, toggleLike, toggleFollow }}>
+      {children}
+    </AppContext.Provider>
+  );
+};
+
+// UserCard.jsx - memakai context
+const { likedUsers, followedUsers, toggleLike, toggleFollow } = useAppContext();
+```
+
+### useRef
+Mengakses elemen input secara langsung untuk fokus ke search bar saat tombol Cari diklik.
+
+```jsx
+// Navbar.jsx
+const searchRef = useRef(null);
+
+const handleFocusSearch = () => {
+  searchRef.current.focus();
+};
+
+<input ref={searchRef} type="text" placeholder="Cari user..." />
+<button onClick={handleFocusSearch}>Cari</button>
+```
