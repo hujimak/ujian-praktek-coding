@@ -4,7 +4,7 @@ Website sosial media sederhana menggunakan React JS yang menampilkan data user d
 
 ---
 
-## 🌐 Fetch API
+Fetch API
 
 Data user diambil dari `https://jsonplaceholder.typicode.com/users` menggunakan `fetch()` di dalam `useEffect`.
 
@@ -31,7 +31,7 @@ useEffect(() => {
 
 ---
 
-## 🧩 Penjelasan Component
+Penjelasan Component
 
 | Component | Fungsi |
 `App.jsx` = Komponen utama, berisi logika fetch API dan filter search |
@@ -42,7 +42,7 @@ useEffect(() => {
 
 ---
 
-## ⚓ Implementasi React Hook
+Implementasi React Hook
 
 ### useState
 Menyimpan data yang bisa berubah seperti daftar user, kata pencarian, status loading, dan data likes/follows.
